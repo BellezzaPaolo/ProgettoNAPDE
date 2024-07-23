@@ -1,0 +1,7 @@
+*.o
+*.EXE
+main
+*.vscode
+.vscode/
+*.json
+.asv

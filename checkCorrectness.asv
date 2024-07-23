@@ -1,0 +1,20 @@
+function [] = checkCorrectness(data)
+n=0;
+for l=1:data.L-1
+    n=n+data.shape(l)*data.shape(l+1)+data.shape(l+1);
+end
+theta=rand(n,1);
+h=rand(n,1);
+eps=1;
+
+for ii=1:4
+    [fp,~]=g(data,theta+eps*h);
+    [fm,~]=FandG(data,theta-eps*h);
+    [~,df]=FandG(data,theta);
+
+    err=abs((fp-fm)/(2.*eps)-df'*h);
+
+    fprintf('eps %10d error %d\n',eps,err);
+
+    eps=eps*0.1;
+end
