@@ -1,5 +1,4 @@
 function [f,df] = FandG(data,y0)
-
     x=data.x;
     y=data.y;
     shape=data.shape;
@@ -45,7 +44,18 @@ function [f,df] = FandG(data,y0)
     for l = (L-1):-1:2
         delta{l-1} = sigmaprime(z{l-1}).*(W{l}'*delta{l});
     end
-    
+
+    for ii=1:size(x,2)
+        A{1} = x(:,ii);
+        for l = 1:L-1
+           z{l} = W{l}*A{l}+b{l};
+           A{l+1} = sigma(z{l});
+           % D{l}=diag(sigmaprime(z{l}));
+        end
+        F(ii)=norm(A{end}-y(:,ii),2);
+    end
+    f=norm(F,2)^2;
+    %f=0.5.*norm(a{end}-y(:,index),2);
     
     % update weights and bias
     for l = 1:L-1
@@ -73,8 +83,6 @@ function [f,df] = FandG(data,y0)
         pointer_y0 = pointer_y0 + gap + 1;
     end
     
-    f=0.5.*mean((a{end}-y(:,index)).^2,'all');
-
-    df=-y1;
+    df=y1;
 
 end

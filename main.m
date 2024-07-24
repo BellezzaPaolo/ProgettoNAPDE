@@ -3,18 +3,27 @@ close all
 clc
 
 data= Dati('Test2');
+[costHistory,y1] = parareal_system(data);
 
-n=0;
-for l=1:data.L-1
-    n=n+data.shape(l)*data.shape(l+1)+data.shape(l+1);
-end
+%%
 
-y=randn(n,1);
-for ii=1:data.Maxiter
-    [f(ii),df]=FandG(data,y);
-    y=y+data.eta*df;
-end
+[costHistory,y]=StocasticGradientDescent(data);
 
 
-semilogy(1:1e3:data.Maxiter,f(1:1e3:end))
+semilogy(1:1e3:data.Maxiter,costHistory(1:1e3:end))
+%%
+clc
+
 checkCorrectness(data);
+
+%%
+clc
+N_fine=ceil(data.Maxiter/data.n_coarse);
+T = data.eta * data.Maxiter;
+n_parameters=0;
+for l=1:data.L-1
+    n_parameters=n_parameters+data.shape(l)*data.shape(l+1)+data.shape(l+1);
+end
+
+y0=0.5*randn(n_parameters,1);
+[U_lowest, k, costhistoryVec] = parareal_systems(T, data.n_coarse, N_fine, y0, data.x, data.y, data.sigma, data.sigmaprime, data.shape);
