@@ -1,4 +1,19 @@
 function [f,df] = FandG(data,y0)
+%=======================================================================================================
+% Computes the value of the Loss function f and its gradient in the given point y0
+%=======================================================================================================
+% INPUTS:
+%   -data: struct that cointans every parameters of the problem (se Dati.m)
+%   -y0: N-dimensional vector that rappresents the point where calculate
+%        the value of the function and its gradient and contains weights and
+%        bias of the NN
+% OUTPUTS:
+%   -f: value of the Loss function in the given point y0
+%   -df: N-dimensional vector containing the derivative of the Loss
+%        function valueted int he point y0
+%=======================================================================================================
+
+
     x=data.x;
     y=data.y;
     shape=data.shape;
@@ -23,7 +38,6 @@ function [f,df] = FandG(data,y0)
         pointer_y0 = pointer_y0 + gap + 1;
     end
     
-    % compute the derivative of the Loss function w.r.t every wheight
     % initialize structures
     z = cell(1,L-1);
     delta = cell(1, L-1);
@@ -45,16 +59,19 @@ function [f,df] = FandG(data,y0)
         delta{l-1} = sigmaprime(z{l-1}).*(W{l}'*delta{l});
     end
 
+    %compute the value of the error function
+    %done by computing the error made from every input and making their
+    %L2-norm
     for ii=1:size(x,2)
         A{1} = x(:,ii);
         for l = 1:L-1
            z{l} = W{l}*A{l}+b{l};
            A{l+1} = sigma(z{l});
-           % D{l}=diag(sigmaprime(z{l}));
         end
         F(ii)=norm(A{end}-y(:,ii),2);
     end
     f=norm(F,2)^2;
+    %done by computing the error of only the training input
     %f=0.5.*norm(a{end}-y(:,index),2);
     
     % update weights and bias
@@ -64,7 +81,6 @@ function [f,df] = FandG(data,y0)
     end
 
 
-    
     % now transform back again the matrices into a vector
     % prepare initial conditions (unfold matrices and biases)
     

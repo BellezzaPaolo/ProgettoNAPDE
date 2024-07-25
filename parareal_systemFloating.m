@@ -1,4 +1,4 @@
-function [costHistory,y1] = parareal_system(data)
+function [costHistory,y1] = parareal_systemFloating(data)
 eta= data.eta;
 MaxIter=data.Maxiter;
 n_coarse=data.n_coarse;
@@ -17,23 +17,22 @@ U_coarse = zeros(n_parameters,n_coarse + 1);
 U_coarse_temp = zeros(n_parameters,n_coarse + 1);
 U_fine = zeros(n_parameters,n_parareal);
 
-U_coarse(:,1) = y0;
-U_coarse_temp(:,1) = y0;
-
 costHistory = zeros(n_coarse*n_fine,n_parareal);
-
-% zeroth iteration
-for i =1:n_coarse
-    [f, y1] = coarse_solver((i-1)*dT, U_coarse_temp(:,i),dT,data);
-    U_coarse_temp(:,i + 1) = y1;
-end
 
 
 % parareal loop
 for k = 1:n_parareal
+
+    U_coarse(:,1) = y0;
+    U_coarse_temp(:,1) = y0;
+    for i =1:n_coarse
+        [~, y1] = coarse_solver((i-1)*dT, U_coarse_temp(:,i),dT,data);
+        U_coarse_temp(:,i + 1) = y1;
+    end
+
     tic;
     % parallel for (fine solver)
-    parfor i = k:n_coarse
+    parfor i = 1:n_coarse
         [cost, y2] = fine_solver((i-1)*dT, U_coarse(:,i), dt, n_fine,data);
         U_fine(:,i)=y2;
         costFine(:,i)=cost;
@@ -45,10 +44,17 @@ for k = 1:n_parareal
     end
 
     % predict - correct
-    for i = k:n_coarse
-        [f, bff1] = coarse_solver((i-1)*dT, U_coarse(:,i), dT, data);
-        [f, bff2] = coarse_solver((i-1)*dT, U_coarse_temp(:,i+1), dT,data);
+    fmin=Inf;
+    for i = 1:n_coarse
+        [~, bff1] = coarse_solver((i-1)*dT, U_coarse(:,i), dT, data);
+        [~, bff2] = coarse_solver((i-1)*dT, U_coarse_temp(:,i), dT,data);
         U_coarse(:,i+1) = bff1 + U_fine(:,i) - bff2;
+        [f,~] = FandG(data,U_coarse(:,i+1));
+        if f<=fmin
+            fmin=f;
+            i+1
+            y0=U_coarse(:,i+1);
+        end
     end
 
     y1=U_fine(:,k);
@@ -59,8 +65,7 @@ for k = 1:n_parareal
         disp(['Parareal converged at iteration ' num2str(k) '/' num2str(n_coarse)])
         break
     end
-    
-    U_coarse_temp = U_coarse;
+
     
     % optional
     time_iter = toc;

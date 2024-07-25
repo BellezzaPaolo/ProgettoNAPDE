@@ -1,10 +1,7 @@
 function [costHistory,y]=StocasticGradientDescent(data)
 costHistory=zeros(1,data.Maxiter);
 
-n_parameters=0;
-for l=1:data.L-1
-    n_parameters=n_parameters+data.shape(l)*data.shape(l+1)+data.shape(l+1);
-end
+n_parameters=CountParameters(data);
 
 y=0.5*randn(n_parameters,1);
 

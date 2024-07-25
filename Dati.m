@@ -1,4 +1,23 @@
 function [data] = Dati(test)
+%=======================================================================================================
+% TEMPLATE OF THE STRUCT DATI
+%=======================================================================================================
+%
+%  DATA= struct( 'name',              % set the name of the test
+%                'x',                 % set the points of the inputs of the NN
+%                'y',                 % set the points of the outputs of the NN
+%                'shape',             % set the number of neurons for every layer of the NN [n1,n2,n2,...]
+%                'L',                 % set the depth of the NN
+%                'sigma',             % set the activation function of every neuron of the NN
+%                'sigmaprime',        % set the derivativeof the activation function
+%                'eta',               % set the value of the learning rate
+%                'batchsize',         % set the size of the batch (the number of points used in the training)
+%                'Maxiter',           % set the maximum number of iteration made by the method
+%                'n_parareal',        % set the number of iteration of the parareal algorithm
+%                'n_coarse',          % set the number of sub interval of my domain 
+%                );
+%========================================================================================================
+
 
 if test=='Test1'
     data = struct( 'name',             test,...
@@ -12,19 +31,19 @@ if test=='Test1'
                    'L',               4,...
                    ...%length of the neural network
                    'sigma',           @(x) tanh(x),...
-                   ...%activation function of every neuron
+                   ...% activation function of every neuron
                    'sigmaprime',      @(x) 1-tanh(x).^2,...
-                   ...%
+                   ...% derivative of the activation function
                    'eta',             0.75,...
-                   ...%
+                   ...% learning rate
                    'batchsize',       20,...
-                   ...%
+                   ...% size of the batch used in the training
                    'Maxiter',         1e4,...
-                   ...%
+                   ...% maximum number of iterations
                    'n_parareal',       6,...
-                   ...%
+                   ...% number of iteration of the parareal algorithm
                    'n_coarse',        6 ...
-                   ...%
+                   ...% number of sub interval of my domain
                    );
 elseif test=='Test2'
     data = struct( 'name',             test,...
@@ -41,14 +60,14 @@ elseif test=='Test2'
                    'sigma',           @(x) 1./(1+exp(-x)),...
                    ...%activation function of every neuron
                    'sigmaprime',      @(x) 1./(1+exp(-x)).*(1-1./(1+exp(-x))),...
-                   ...%
+                   ...% derivative of the activation function
                    'eta',             0.75,...
                    ...%
-                   'batchsize',       1,...
+                   'batchsize',       10,...
                    ...%
-                   'Maxiter',         1e4,...
+                   'Maxiter',         1e5,...
                    ...%
-                   'n_parareal',       6,...
+                   'n_parareal',       10,...
                    ...%
                    'n_coarse',        6 ...
                    ...%

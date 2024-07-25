@@ -1,4 +1,4 @@
-function [costHistory,y1] = parareal_system(data)
+function [costHistory,y1] = parareal_systemPrimaIterata(data)
 eta= data.eta;
 MaxIter=data.Maxiter;
 n_coarse=data.n_coarse;
@@ -23,21 +23,19 @@ U_coarse_temp(:,1) = y0;
 costHistory = zeros(n_coarse*n_fine,n_parareal);
 
 % zeroth iteration
-for i =1:n_coarse
-    [f, y1] = coarse_solver((i-1)*dT, U_coarse_temp(:,i),dT,data);
-    U_coarse_temp(:,i + 1) = y1;
-end
+[f, y1] = coarse_solver(dT, U_coarse_temp(:,1),dT,data);
+U_coarse_temp(:,2) = y1;
+
 
 
 % parareal loop
 for k = 1:n_parareal
     tic;
     % parallel for (fine solver)
-    parfor i = k:n_coarse
-        [cost, y2] = fine_solver((i-1)*dT, U_coarse(:,i), dt, n_fine,data);
-        U_fine(:,i)=y2;
-        costFine(:,i)=cost;
-    end
+    [cost, y2] = fine_solver(dT, U_coarse(:,1), dt, n_fine,data);
+    U_fine(:,1)=y2;
+    costFine(:,1)=cost;
+
     gap=1;
     for jj=1:n_coarse
         costHistory(gap:gap+n_fine-1,k)=costFine(:,jj);
@@ -47,8 +45,8 @@ for k = 1:n_parareal
     % predict - correct
     for i = k:n_coarse
         [f, bff1] = coarse_solver((i-1)*dT, U_coarse(:,i), dT, data);
-        [f, bff2] = coarse_solver((i-1)*dT, U_coarse_temp(:,i+1), dT,data);
-        U_coarse(:,i+1) = bff1 + U_fine(:,i) - bff2;
+        [f, bff2] = coarse_solver((i-1)*dT, U_coarse_temp(:,i), dT,data);
+        U_coarse(:,i+1) = bff1 + U_fine(:,1) - bff2;
     end
 
     y1=U_fine(:,k);
@@ -64,7 +62,7 @@ for k = 1:n_parareal
     
     % optional
     time_iter = toc;
-    disp(['iteration ' num2str(k) '/' num2str(n_parareal) ', time: ', num2str(time_iter) ', time remaining: ', num2str((n_parareal-k)*time_iter)])
+    disp(['iteration ' num2str(k) '/' num2str(n_coarse) ', time: ', num2str(time_iter) ', time remaining: ', num2str((n_coarse-k)*time_iter)])
     disp(['iteration ' num2str(k) ', cost_history = ', num2str(costHistory(end,k))])
 end
 end
