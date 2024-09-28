@@ -19,15 +19,16 @@ checkCorrectness(data);
 
 %%
 %==========================================================================
-% TRAINING WITH SOCASTIC GRADIENT DESCENT
+% TRAINING WITH STOCASTIC GRADIENT DESCENT
 %==========================================================================
 
 [costHistory,y]=StocasticGradientDescent(data);
 
 semilogy(1:1e3:data.Maxiter,costHistory(1:1e3:end))
 
-%% training with parareal using the old project
+%% training with parareal using the old project (togliere)
 clc
+addpath('final_NAPDE\')
 N_fine=ceil(data.Maxiter/data.n_coarse);
 T = data.eta * data.Maxiter;
 n_parameters=0;

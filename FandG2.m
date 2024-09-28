@@ -1,9 +1,9 @@
-function [f,df]=FandG(data,y0,index)
+function [f,df]=FandG2(data,y0)
 %=======================================================================================================
 % Computes the value of the Loss function f and the gradient in the given point y0
 %=======================================================================================================
 % INPUTS:
-%   -data: struct that cointans every parameters of the problem (see Dati.m)
+%   -data: struct that cointans every parameters of the problem (se Dati.m)
 %   -y0: N-dimensional vector that rappresents the point where calculate
 %        the value of the function and its gradient and contains weights and
 %        bias of the NN
@@ -14,6 +14,7 @@ function [f,df]=FandG(data,y0,index)
 %=======================================================================================================
 
 L=data.L;
+index=10;%randperm(size(x,2),data.batchsize);
 x=data.x;
 y=data.y;
 sigma=data.sigma;
@@ -42,9 +43,9 @@ f=0;
 df=zeros(size(y0));
 
 
-for j=1:size(index,2)
+for j=1:index
     % forward pass
-    a{1}=x(:,index(j));%j);
+    a{1}=x(:,j);
     for l=2:L
         z{l}=W{l}*a{l-1}+b{l};
         a{l}=sigma(z{l});
@@ -52,10 +53,10 @@ for j=1:size(index,2)
     end
     
     % compute the cost function
-    f=f+0.5*norm(a{end}-y(:,index(j))).^2;
+    f=f+0.5*norm(a{end}-y(:,j)).^2;
     
     % compute the delta and back propagation
-    delta{L}=sigmaprime(z{L}).*(a{end}-y(:,index(j)));
+    delta{L}=sigmaprime(z{L}).*(a{end}-y(:,j));
     for l=L-1:-1:2
         delta{l}=sigmaprime(z{l}).*(W{l+1}'*delta{l+1});
     end
@@ -71,4 +72,4 @@ for j=1:size(index,2)
         pointer_df=pointer_df+data.shape(l);
     end
 end
-%end
+end
