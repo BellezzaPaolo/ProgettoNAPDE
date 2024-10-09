@@ -7,7 +7,7 @@ clc
 % LOAD DATA FOR TEST CASE
 %==========================================================================
 
-data= Dati('Test2');
+data= Dati('TestHigham');
 
 %%
 %==========================================================================
@@ -49,9 +49,12 @@ y0=0.5*randn(n_parameters,1);
 %==========================================================================
 % PLOT THE DATA
 %==========================================================================
-
-semilogy(1:size(costHistory,1),costHistory)
-legend('iter1','iter2','iter3','iter4','iter5','iter6')
+c=['iter1';'iter2';'iter3';'iter4';'iter5';'iter6'];
+for ii=1:6
+    subplot(2,3,ii)
+    semilogy(1:size(costHistory,1),costHistory(:,ii))
+    legend(c(ii,:))
+end
 
 
 %%

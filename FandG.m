@@ -7,6 +7,8 @@ function [f,df]=FandG(data,y0,index)
 %   -y0: N-dimensional vector that rappresents the point where calculate
 %        the value of the function and its gradient and contains weights and
 %        bias of the NN
+%   -index: vector that contains the indexes of the points in the batch
+%        used in this itertion of the training
 % OUTPUTS:
 %   -f: value of the Loss function in the given point y0
 %   -df: N-dimensional vector containing the derivative of the Loss
