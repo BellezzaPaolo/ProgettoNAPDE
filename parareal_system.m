@@ -16,8 +16,8 @@ n_parareal=data.n_parareal;
 
 %T = eta * MaxIter;
 %n_fine=ceil(MaxIter/n_coarse);
-n_fine=50000;
-n_coarse=10;
+n_fine=2000;
+n_coarse=12;
 dT=0.01;%T/n_coarse;
 dt=0.01;%T/(n_fine);
 
@@ -34,10 +34,6 @@ U_coarse(:,1) = y0;
 U_coarse_temp(:,1) = y0;
 
 costHistory = zeros(n_coarse*n_fine,n_parareal);
-
-
-%while
-
 
 % zeroth iteration
 for i =1:n_coarse
@@ -84,7 +80,4 @@ for k = 1:n_parareal
     disp(['iteration ' num2str(k) '/' num2str(n_parareal) ', time: ', num2str(time_iter) ', time remaining: ', num2str((n_parareal-k)*time_iter)])
     disp(['iteration ' num2str(k) ', cost_history = ', num2str(costHistory(end,k))])
 end
-%end
-
-
 end
