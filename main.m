@@ -26,18 +26,6 @@ checkCorrectness(data);
 
 semilogy(1:1e3:data.Maxiter,costHistory(1:1e3:end))
 
-%% training with parareal using the old project (togliere)
-clc
-addpath('final_NAPDE\')
-N_fine=ceil(data.Maxiter/data.n_coarse);
-T = data.eta * data.Maxiter;
-n_parameters=0;
-for l=1:data.L-1
-    n_parameters=n_parameters+data.shape(l)*data.shape(l+1)+data.shape(l+1);
-end
-
-y0=0.5*randn(n_parameters,1);
-[U_lowest, k, costhistoryVec] = parareal_systems(T, data.n_coarse, N_fine, y0, data.x, data.y, data.sigma, data.sigmaprime, data.shape);
 %%
 %==========================================================================
 % TRAINING WITH PARAREAL
@@ -49,9 +37,10 @@ y0=0.5*randn(n_parameters,1);
 %==========================================================================
 % PLOT THE DATA
 %==========================================================================
-c=['iter1';'iter2';'iter3';'iter4';'iter5';'iter6'];
-for ii=1:6
-    subplot(2,3,ii)
+figure()
+c=['iter1';'iter2';'iter3';'iter4';'iter5';'iter6';'iter7';'iter8';'iter9';'ite10';'ite11';'ite12'];
+for ii=1:12
+    subplot(4,3,ii)
     semilogy(1:size(costHistory,1),costHistory(:,ii))
     legend(c(ii,:))
 end
@@ -63,5 +52,19 @@ end
 %==========================================================================
 
 clc
-[costHistory,y1] = parareal_systemFloating(data);
+[costHistory,y1] = paraflows(data);
 
+
+%%
+close all
+n_coarse=20;
+n_fine=2000;
+costHistorydis=NaN(size(costHistory,1)*size(costHistory,2),size(costHistory,2)-1);
+figure()
+for i=1:size(costHistory,2)-1
+    costHistorydis(i*n_coarse*n_fine:i*n_coarse*n_fine+n_coarse*n_fine-1,i)=costHistory(:,i);
+end
+
+%hold on
+semilogy(costHistorydis(1:100:end,:))
+grid on
