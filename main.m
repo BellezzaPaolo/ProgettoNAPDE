@@ -31,7 +31,7 @@ semilogy(1:1e3:data.Maxiter,costHistory(1:1e3:end))
 % TRAINING WITH PARAREAL
 %==========================================================================
 
-[costHistory,y1] = parareal_system(data);
+[costHistory,y] = parareal_system(data);
 
 %%
 %==========================================================================
@@ -48,16 +48,15 @@ end
 
 %%
 %==========================================================================
-% TRAINING WITH PARAREAL AND FLOATING 
+% TRAINING WITH PARAFLOWS 
 %==========================================================================
 
 clc
-[costHistory,y1] = paraflows(data);
-
+[costHistory,y] = paraflows(data);
 
 %%
 close all
-n_coarse=20;
+n_coarse=6;
 n_fine=2000;
 costHistorydis=NaN(size(costHistory,1)*size(costHistory,2),size(costHistory,2)-1);
 figure()
@@ -68,3 +67,26 @@ end
 %hold on
 semilogy(costHistorydis(1:100:end,:))
 grid on
+
+%%
+close all
+n_coarse=6;
+n_fine=2000;
+
+figure()
+semilogy(1,costHistory(1,1),'o');
+gap=0;
+c=['#0072BD';'#D95319';'#EDB120';'#7E2F8E';'#77AC30';'#4DBEEE';'#A2142F'];
+hold on
+for ii=1:size(costHistory,2)-1
+    semilogy(gap+2:gap+n_fine+1,costHistory(2:n_fine+1,ii),'Color',c(mod(ii-1,size(c,2))+1,:));
+    semilogy(gap+n_fine+2:n_fine:gap+n_fine*n_coarse+n_fine+1,costHistory(n_fine+2:end,ii),'o','MarkerEdgeColor',c(mod(ii-1,size(c,2))+1,:));
+    gap=costHistory(1,ii+1)*n_fine+gap;
+end
+
+%%
+%==========================================================================
+% PLOT THE CLASSIFICATION REGION
+%==========================================================================
+
+Disegno(data,y)
