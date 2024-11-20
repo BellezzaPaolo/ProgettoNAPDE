@@ -1,4 +1,4 @@
-function [costHistory,y1] = paraflows(data)
+function [costHistory,y1] = paraflows(data,stampa)
 %=======================================================================================================
 % Apply the paraflows algorithm to the training of the NN
 %=======================================================================================================
@@ -10,14 +10,11 @@ function [costHistory,y1] = paraflows(data)
 %   -y1: vector that contains the weights and biases at the end of the
 %       training
 %=======================================================================================================
-L=data.L;
 
-%T = eta * MaxIter;
-%n_fine=ceil(MaxIter/n_coarse);
-n_fine=2000;
-n_coarse=6;
-dT=0.01;%T/n_coarse;
-dt=0.01;%T/(n_fine);
+n_fine=data.n_fine;
+n_coarse=data.n_coarse;
+dT=data.dT;
+dt=data.dt;
 
 rng(50)
 % count the number of parameters
@@ -35,7 +32,7 @@ costHistory = ones(1+n_fine+n_coarse,1);
 
 k=1;
 errore=100;
-while errore>10^-3 && k<100
+while errore>10^-3 && k<data.Maxiter
     U_coarse(:,1)=U_coarse_temp;
     % parareal loop
     tic;
@@ -45,43 +42,35 @@ while errore>10^-3 && k<100
     costHistory(2:n_fine+1,end)=costFine;
     %a=zeros(n_coarse,1); b=zeros(n_coarse,1);
 
-    m=100;
+    m=0;
+    errore=costHistory(n_fine+1,end);
     % predict - correct
-    for i = 1:n_coarse
-        [~, bff1] = coarse_solver((i-1)*dT, U_coarse(:,i), dT,data);
-        [~, bff2] = coarse_solver((i-1)*dT, U_coarse_temp, dT,data);
-        % a(i)=norm(bff1-bff2);
-        % b(i)=norm(U_fine-bff2);
+    [~, bff2] = coarse_solver((1-1)*dT, U_coarse_temp, dT,data);
+    bff1=bff2;
+    i=1;
+    esci=true;
+    while esci && i<=n_coarse
         U_coarse(:,i+1) = bff1 + U_fine - bff2;
+        [costHistory(1+n_fine+i,end), bff1] = coarse_solver((i-1)*dT, U_coarse(:,i+1), dT,data);
         
-        [costHistory(1+n_fine+i,end),~]=FandG(data,U_coarse(:,i+1),randperm(size(data.x,2),data.batchsize_coarse));
 
-        if costHistory(1+n_fine+i,end)<=errore
+        if costHistory(n_fine+i+1,end)<=errore
             errore=costHistory(1+n_fine+i,end);
             m=i+1;
+        else
+            esci=false;
         end
+        i=i+1;
     end
-    
-    % m=100;
-    % for c=1:n_coarse
-    % 
-    %     [costHistory(1+n_fine+c,end),~]=FandG(data,U_coarse(:,c+1),randperm(size(data.x,2),data.batchsize_coarse));
-    % 
-    %     if costHistory(1+n_fine+c,end)<=errore
-    %         errore=costHistory(1+n_fine+c,end);
-    %         m=c+1;
-    %     end        
-    % end
 
-    if k>=10
-        %keyboard
-    end
+    
     % time and print (optional)
     time_iter = toc;
-    disp(['iteration ' num2str(k) ', time: ', num2str(time_iter)])
-    disp(['iteration ' num2str(k) ', cost_history = ', num2str(costHistory(end,end))])
+    if stampa
+        disp(['iteration ' num2str(k) ', time: ', num2str(time_iter) ', cost_history = ', num2str(costHistory(n_fine+m-1,end))])
+    end
     costHistory=[costHistory ones(1+n_fine+n_coarse,1)];
-    if m==100
+    if m==0
         U_coarse_temp=U_fine;
         m=1;
     else
@@ -91,6 +80,4 @@ while errore>10^-3 && k<100
     k=k+1;
 end
 y1=U_coarse_temp;
-errore
-k
 end

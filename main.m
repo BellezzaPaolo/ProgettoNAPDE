@@ -7,7 +7,7 @@ clc
 % LOAD DATA FOR TEST CASE
 %==========================================================================
 
-data= Dati('TestHigham');
+data= Dati('TestSmorzato');
 
 %%
 %==========================================================================
@@ -22,7 +22,7 @@ checkCorrectness(data);
 % TRAINING WITH STOCASTIC GRADIENT DESCENT
 %==========================================================================
 
-[costHistory,y]=StocasticGradientDescent(data);
+[costHistory,y]=StocasticGradientDescent(data,true);
 
 semilogy(1:1e3:data.Maxiter,costHistory(1:1e3:end))
 
@@ -51,8 +51,8 @@ end
 % TRAINING WITH PARAFLOWS 
 %==========================================================================
 
-clc
-[costHistory,y] = paraflows(data);
+%clc
+[costHistory,y] = paraflows(data,true);
 
 %%
 close all
@@ -90,3 +90,11 @@ end
 %==========================================================================
 
 Disegno(data,y)
+
+%%
+%==========================================================================
+% PERFORMANCE TEST
+%==========================================================================
+clc
+
+[M,costi,T] = performanceTest(data);
