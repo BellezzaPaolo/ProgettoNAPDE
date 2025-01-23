@@ -15,9 +15,6 @@ function [f,df]=FandG(data,y0,index)
 %        function valueted int he point y0
 %=======================================================================================================
 
-global iterParaflow
-iterParaflow=iterParaflow+1;
-
 L=data.L;
 x=data.x;
 y=data.y;

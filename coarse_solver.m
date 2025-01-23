@@ -14,7 +14,10 @@ function [f,y1]=coarse_solver(t0,y0,dT,data)
 %   -y1: vector that contains the weights and biases at the end of the
 %       training
 %=======================================================================================================
-    index=randperm(size(data.x,2),data.batchsize_coarse);
+    index=randperm(size(data.x,2),data.batchsize_coarse);    
+    global iterCoarse
+    iterCoarse=iterCoarse+1;
+
     [f,df] = FandG(data,y0,index);
     y1=y0-dT*df;
 end

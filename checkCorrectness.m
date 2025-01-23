@@ -12,7 +12,7 @@ n_parameters=CountParameters(data);
 theta=rand(n_parameters,1);
 h=rand(n_parameters,1);
 eps=1;
-index=randperm(size(data.x,2),data.batchsize_coarse);
+index=randperm(size(data.x,2),data.batchsize_gradient);
 
 err=zeros(1,4);
 [~,df]=FandG(data,theta,index);

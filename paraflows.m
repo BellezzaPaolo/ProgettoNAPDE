@@ -29,10 +29,12 @@ U_coarse_temp = y0;
 
 costHistory = ones(1+n_fine+n_coarse,1);
 [costHistory(1),~]=FandG(data,y0,randperm(size(data.x,2),data.batchsize_coarse));
+global iterCoarse
+iterCoarse=iterCoarse+1;
 
 k=1;
-errore=100;
-while errore>10^-3 && k<data.Maxiter
+errore=90;
+while errore>10^-3 && k<data.Maxiter %&& errore<10^2
     U_coarse(:,1)=U_coarse_temp;
     % parareal loop
     tic;
@@ -54,7 +56,7 @@ while errore>10^-3 && k<data.Maxiter
         [costHistory(1+n_fine+i,end), bff1] = coarse_solver((i-1)*dT, U_coarse(:,i+1), dT,data);
         
 
-        if costHistory(n_fine+i+1,end)<=errore
+        if costHistory(n_fine+i+1,end)<=errore || i==1
             errore=costHistory(1+n_fine+i,end);
             m=i+1;
         else
@@ -66,7 +68,7 @@ while errore>10^-3 && k<data.Maxiter
     
     % time and print (optional)
     time_iter = toc;
-    if stampa
+    if stampa && mod(k,200)==0
         disp(['iteration ' num2str(k) ', time: ', num2str(time_iter) ', cost_history = ', num2str(costHistory(n_fine+m-1,end))])
     end
     costHistory=[costHistory ones(1+n_fine+n_coarse,1)];
@@ -80,4 +82,9 @@ while errore>10^-3 && k<data.Maxiter
     k=k+1;
 end
 y1=U_coarse_temp;
+
+%if errore>100
+%   print("parareal not converged")
+%end
+
 end

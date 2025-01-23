@@ -36,7 +36,7 @@ if strcmp(data.name,'TestHigham')
         
         end
     end
-    
+    figure()
     [X,Y] = meshgrid(xvals,yvals);
     clf
     Mval = Aval>Bval;
@@ -70,7 +70,7 @@ else
         ypred(i)=a{end};
     end
 
-    figure(1)
+    figure()
     plot(data.x,data.y,'*')
     hold on
     plot(xdis,f(xdis),'-')

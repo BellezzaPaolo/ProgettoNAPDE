@@ -16,9 +16,13 @@ function [cost,y0] = fine_solver(t0, y0, dt, n_fine,data)
 %       training
 %=======================================================================================================
 cost=zeros(n_fine,1);
+
+global iterFine
+
 for ii=1:n_fine
     index=randperm(size(data.x,2),data.batchsize_fine);
     [cost(ii),df]=FandG(data,y0,index);
+    iterFine=iterFine+1;
     y0=y0-dt*df;
 end
 end

@@ -12,18 +12,20 @@ function [costHistory,y1] = parareal_system(data)
 %=======================================================================================================
 eta= data.eta;
 MaxIter=data.Maxiter;
-n_parareal=data.n_parareal;
+n_parareal=data.n_coarse;
+n_fine = data.n_fine;
+n_coarse = data.n_coarse;
+dT = data.dT;
+dt = data.dt;
 
 %T = eta * MaxIter;
 %n_fine=ceil(MaxIter/n_coarse);
-n_fine=2000;
-n_coarse=12;
-dT=0.01;%T/n_coarse;
-dt=0.01;%T/(n_fine);
+%T/n_coarse;
+%T/(n_fine);
 
 % count the number of parameters
 n_parameters=CountParameters(data);
-
+rng(50)
 y0=0.5*randn(n_parameters,1);
 
 U_coarse = zeros(n_parameters,n_coarse + 1);
@@ -64,11 +66,14 @@ for k = 1:n_parareal
         U_coarse(:,i+1) = U_coarse_temp(:,i + 1) + U_fine(:,i) - bff2;
     end
 
-    y1=U_fine(:,k);
+    y1=U_fine(:,end);
 
     % check for convergence
-    incr = norm(U_coarse - U_coarse_temp, 2);
-    if (incr < 1e-4)
+    incr = norm(U_coarse - U_coarse_temp, 2);%/norm(U_coarse,2);
+    if (incr < 1e-3 || k == 20)
+        time_iter = toc;
+        disp(['iteration ' num2str(k) '/' num2str(n_parareal) ', time: ', num2str(time_iter) ', time remaining: ', num2str((n_parareal-k)*time_iter)])
+        disp(['iteration ' num2str(k) ', cost_history = ', num2str(costHistory(end,k)),'  =  ', num2str(incr)])
         disp(['Parareal converged at iteration ' num2str(k) '/' num2str(n_coarse)])
         break
     end
@@ -78,6 +83,6 @@ for k = 1:n_parareal
     % time and print (optional)
     time_iter = toc;
     disp(['iteration ' num2str(k) '/' num2str(n_parareal) ', time: ', num2str(time_iter) ', time remaining: ', num2str((n_parareal-k)*time_iter)])
-    disp(['iteration ' num2str(k) ', cost_history = ', num2str(costHistory(end,k))])
+    disp(['iteration ' num2str(k) ', cost_history = ', num2str(costHistory(end,k)),'  =  ', num2str(incr)])
 end
 end
