@@ -8,8 +8,8 @@ main
 *.fig
 *.png
 *.mat
-final_NAPDE/coarse_solver.m
-final_NAPDE/fine_solver.m
-final_NAPDE/gradL.m
-final_NAPDE/parareal_systems.m
-projectCiaramella/*.m
+*final_NAPDE*
+*projectOld*
+*Validation*
+*immagini*
+*paper*
